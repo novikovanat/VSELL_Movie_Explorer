@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
+import useCashedFetch from "../../hooks/useCachedFetch";
 import SearchBar from "../../components/SearchBar/SearchBar";
-import fetchMovies from "../../js/fetchMovies";
 import MovieList from "../../components/MovieList/MovieList";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import Loader from "../../components/Loader/Loader";
@@ -10,6 +10,7 @@ import Pagination from "../../components/Pagination/Pagination";
 export default function MoviesPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const { response, loading, error } = useCashedFetch(query, page);
   const [userFavorites, setUserFavorites] = useState(() => {
     const favorites = window.localStorage.getItem("favorites");
 
@@ -22,43 +23,10 @@ export default function MoviesPage() {
       }
     } else return [];
   });
-  const [response, setResponse] = useState({
-    Search: [],
-    totalResults: 0,
-    Response: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     window.localStorage.setItem("favorites", JSON.stringify(userFavorites));
   }, [userFavorites]);
-
-  useEffect(() => {
-    if (query === "") {
-      return;
-    }
-
-    search(query, page);
-  }, [query, page, userFavorites]);
-
-  const search = async (query, page) => {
-    try {
-      setLoading(true);
-      setError("");
-      const apiResponse = await fetchMovies(query, page);
-
-      if (apiResponse.Response == "False") {
-        setError(apiResponse.Error);
-        return;
-      }
-      setResponse(apiResponse);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div>
