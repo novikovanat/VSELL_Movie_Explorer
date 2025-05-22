@@ -5,6 +5,7 @@ import MovieList from "../../components/MovieList/MovieList";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import Loader from "../../components/Loader/Loader";
 import Favorites from "../../components/Favorites/Favorites";
+import Pagination from "../../components/Pagination/Pagination";
 
 export default function MoviesPage() {
   const [query, setQuery] = useState("");
@@ -66,6 +67,13 @@ export default function MoviesPage() {
       {error !== "" && <ErrorMessage errorText={error} />}
       {0 < response.totalResults && (
         <MovieList moviesArray={response.Search} onClick={setUserFavorites} />
+      )}
+      {response.totalResults > 10 && (
+        <Pagination
+          setPage={setPage}
+          totalCount={response.totalResults}
+          currentPage={page}
+        />
       )}
       {0 < userFavorites.length && (
         <Favorites favorites={userFavorites} onClick={setUserFavorites} />

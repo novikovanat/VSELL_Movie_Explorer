@@ -19,5 +19,6 @@ export default function MovieList({ moviesArray, onClick }) {
       </li>
     );
   });
+
   return <ul>{movieList}</ul>;
 }
