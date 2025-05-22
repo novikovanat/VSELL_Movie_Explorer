@@ -1,11 +1,15 @@
+import MovieCard from "../MovieCard/MovieCard";
+
 export default function MovieList({ moviesArray }) {
-  const movieList = moviesArray.map(({ Title, imdbID, Poster, Year, Type }) => {
+  function handleClick(item) {
+    console.log("clicked", item);
+  }
+  const movieList = moviesArray.map((item) => {
     return (
-      <li key={imdbID}>
-        <img src={Poster} alt={`poster${Title}`} />
-        <h2>{Title}</h2>
-        <p>year: {Year} </p>
-        <p>{Type}</p>
+      <li key={item.imdbID} onClick={() => handleClick(item)}>
+        <h2>{item.Title}</h2>
+        <img src={item.Poster} alt={`poster for ${item.Title}`} />
+        <p>{item.Year}</p>
       </li>
     );
   });
