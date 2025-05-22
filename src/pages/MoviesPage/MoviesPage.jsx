@@ -4,10 +4,23 @@ import fetchMovies from "../../js/fetchMovies";
 import MovieList from "../../components/MovieList/MovieList";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import Loader from "../../components/Loader/Loader";
+import Favorites from "../../components/Favorites/Favorites";
 
 export default function MoviesPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [userFavorites, setUserFavorites] = useState(() => {
+    const favorites = window.localStorage.getItem("favorites");
+
+    if (favorites !== null) {
+      try {
+        return JSON.parse(favorites);
+      } catch (error) {
+        console.log("Error parsing favorites from localStorage", error);
+        return;
+      }
+    } else return [];
+  });
   const [response, setResponse] = useState({
     Search: [],
     totalResults: 0,
@@ -17,12 +30,16 @@ export default function MoviesPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    query ?? "";
+    window.localStorage.setItem("favorites", JSON.stringify(userFavorites));
+  }, [userFavorites]);
+
+  useEffect(() => {
     if (query === "") {
       return;
     }
+
     search(query, page);
-  }, [query, page]);
+  }, [query, page, userFavorites]);
 
   const search = async (query, page) => {
     try {
@@ -45,9 +62,14 @@ export default function MoviesPage() {
   return (
     <div>
       <SearchBar value={query} onSearch={setQuery} onPage={setPage} />
-      {loading === true && <Loader />}
+      {loading && <Loader />}
       {error !== "" && <ErrorMessage errorText={error} />}
-      {0 < response.totalResults && <MovieList moviesArray={response.Search} />}
+      {0 < response.totalResults && (
+        <MovieList moviesArray={response.Search} onClick={setUserFavorites} />
+      )}
+      {0 < userFavorites.length && (
+        <Favorites favorites={userFavorites} onClick={setUserFavorites} />
+      )}
     </div>
   );
 }
